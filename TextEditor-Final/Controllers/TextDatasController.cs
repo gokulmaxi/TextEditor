@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -11,6 +12,7 @@ using TextEditor_Final.Models;
 
 namespace TextEditor_Final.Controllers
 {
+    [Authorize]
     public class TextDatasController : Controller
     {
         private readonly TextEditorContext _context;
@@ -25,8 +27,12 @@ namespace TextEditor_Final.Controllers
         // GET: TextDatas
         public async Task<IActionResult> Index()
         {
-              return _context.TextData != null ? 
-                          View(await _context.TextData.ToListAsync()) :
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+            var userID = await _userManager.GetUserAsync(User);
+            return _context.TextData != null ? 
+                          View(await _context.TextData
+                          .Where(s => s.User == userID)
+                          .ToListAsync()) :
                           Problem("Entity set 'TextEditorContext.TextData'  is null.");
         }
 
