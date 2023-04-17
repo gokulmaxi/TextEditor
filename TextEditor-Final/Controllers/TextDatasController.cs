@@ -62,10 +62,11 @@ namespace TextEditor_Final.Controllers
         public async Task<IActionResult> Create([Bind("FileId,FileName,Data")] TextData textData)
         {
             var user =  await _userManager.GetUserAsync(User);
+            Console.WriteLine(user.UserName);
             textData.User = user;
                 _context.Add(textData);
                 await _context.SaveChangesAsync();
-            return View(textData);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: TextDatas/Edit/5
@@ -91,13 +92,14 @@ namespace TextEditor_Final.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("FileId,FileName,Data")] TextData textData)
         {
+            var user =  await _userManager.GetUserAsync(User);
+            Console.WriteLine(user.UserName);
+            textData.User = user;
             if (id != textData.FileId)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
                 try
                 {
                     _context.Update(textData);
@@ -115,7 +117,6 @@ namespace TextEditor_Final.Controllers
                     }
                 }
                 return RedirectToAction(nameof(Index));
-            }
             return View(textData);
         }
 
